@@ -23,8 +23,8 @@ warmup_proportion = 0.1
 
 train_data = (Path(data_dir) / 'train_data.json').open()
 dev_data = (Path(data_dir) / 'dev_data.json').open()
-train_labels, train_utts = [(l['label'], l['text']) for l in json.load(train_data)]
-dev_labels, dev_utts = [(l['label'], l['text']) for l in json.load(dev_data)]
+train_labels, train_utts = zip(*[(l['label'], l['text']) for l in json.load(train_data)])
+dev_labels, dev_utts = zip(*[(l['label'], l['text']) for l in json.load(dev_data)])
 
 if not (Path(data_dir)/'kg_labels.json').exists():
     label_list = sorted(set(train_labels))
@@ -140,6 +140,8 @@ for e in range(epoch_num):
     tr_loss = 0
 
     for batch_idx, batch in enumerate(trainset):
+        if batch_idx > 1:
+            break
         batch = tuple(t.to(device) for t in batch)
         x_ids, y_ids, x_m, x_s = batch
         loss = model(x_ids, x_s, x_m, y_ids)
@@ -151,7 +153,7 @@ for e in range(epoch_num):
         optimizer.zero_grad()
 
         tr_loss += loss.item()
-        if batch_idx % 100 == 0 and batch_idx != 0:
+        if batch_idx % 10 == 0 and batch_idx != 0:
             logger.info(f'Epoch:{e} - batch:{batch_idx}/{trainset.steps} - loss: {tr_loss / (batch_idx+1):.8f}')
 
     model.eval()
