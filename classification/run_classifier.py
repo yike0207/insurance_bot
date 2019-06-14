@@ -16,6 +16,9 @@ logging.basicConfig(format='%(asctime)s - %(levelname)s - %(name)s -   %(message
                     level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+if torch.cuda.is_available():
+    torch.backends.cudnn.benchmark=True
+
 batch_size = 64
 epoch_num = 10
 learning_rate = 5e-5
@@ -83,7 +86,7 @@ class data_generator:
             M.append(text_mask)
             Y.append(label2id.get(label))
 
-            if len(X) == batch_size:
+            if len(X) == batch_size or i == idxs[-1]:
                 X = torch.tensor(seq_padding(X), dtype=torch.long)
                 Y = torch.tensor(Y, dtype=torch.long)
                 M = torch.tensor(seq_padding(M), dtype=torch.long)
@@ -140,8 +143,6 @@ for e in range(epoch_num):
     tr_loss = 0
 
     for batch_idx, batch in enumerate(trainset):
-        if batch_idx > 1:
-            break
         batch = tuple(t.to(device) for t in batch)
         x_ids, y_ids, x_m, x_s = batch
         loss = model(x_ids, x_s, x_m, y_ids)

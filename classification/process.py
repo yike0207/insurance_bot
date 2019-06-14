@@ -23,6 +23,9 @@ for row in df.iterrows():
     text_words = jieba.lcut(text, HMM=False)
     label = row[1]['label']
 
+    if len(text) > 500:  # 检查句长
+        continue
+
     d = {
         'text': text,
         'text_words': text_words,
