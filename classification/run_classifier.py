@@ -147,8 +147,8 @@ for e in range(epoch_num):
     tr_loss = 0
 
     for batch_idx, batch in enumerate(trainset):
-        batch = tuple(t.to(device) for t in batch)
-        x_ids, y_ids, x_m, x_s, t = batch
+        batch = tuple(t.to(device) if i<len(batch)-1 else t for i, t in enumerate(batch))
+        x_ids, y_ids, x_m, x_s, _ = batch
         loss = model(x_ids, x_s, x_m, y_ids)
 
         if n_gpu > 1:
@@ -165,8 +165,8 @@ for e in range(epoch_num):
     dev_size = 0
     dev_acc = 0
     for batch_idx, batch in enumerate(devset):
-        batch = tuple(t.to(device) for t in batch)
-        x_ids, y_ids, x_m, x_s,t = batch
+        batch = tuple(t.to(device) if i<len(batch)-1 else t for i, t in enumerate(batch))
+        x_ids, y_ids, x_m, x_s,tt = batch
         with torch.no_grad():
             y_p = model(x_ids, x_s, x_m)
         y_p = y_p.detach().cpu().numpy()
@@ -176,7 +176,7 @@ for e in range(epoch_num):
         dev_acc += np.sum(y_p == y_ids)
         dev_size += x_ids.size(0)
 
-        for pr, tr,t_ in zip(y_p, y_ids,t):
+        for pr, tr,t_ in zip(y_p, y_ids,tt):
             if pr != tr:
                 err_list.append({
                     'text':t_,
