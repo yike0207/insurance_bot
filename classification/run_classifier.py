@@ -139,8 +139,8 @@ trainset = data_generator(train_utts, train_labels)
 devset = data_generator(dev_utts, dev_labels)
 best_score = 0
 best_epoch = 0
-
 err_list = []
+
 for e in range(epoch_num):
     model.train()
     tr_loss = 0
@@ -178,6 +178,7 @@ for e in range(epoch_num):
         for pr, tr,t_ in zip(y_p, y_ids,tt):
             if pr != tr:
                 err_list.append({
+                    'epoch_num':e,
                     'text':t_,
                     'true':label_list[pr],
                     'pred':label_list[tr]
