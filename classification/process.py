@@ -43,7 +43,7 @@ print(f'train size: {len(train_data)}, dev size: {len(dev_data)}')  # train size
 # negative samples
 neg_list = []
 for fn in Path(data_dir).iterdir():
-    if str(fn).endswith('csv'):
+    if fn.name not in ['negative_samples.txt','非保险相关-补充500.txt','非保险相关-补充3000.txt']:
         continue
     for line in fn.open():
         neg_list.append(line.strip())

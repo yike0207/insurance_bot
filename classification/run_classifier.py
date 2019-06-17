@@ -75,7 +75,7 @@ class data_generator:
     def __iter__(self):
         idxs = list(range(len(self.data_x)))
         np.random.shuffle(idxs)
-        X, Y,M = [], [],[]
+        X, Y,M,T = [], [],[],[]
         for i in idxs:
             text = self.data_x[i]
             label = self.data_y[i]
@@ -85,6 +85,7 @@ class data_generator:
             X.append(text_ids)
             M.append(text_mask)
             Y.append(label2id.get(label))
+            T.append(text)
 
             if len(X) == batch_size or i == idxs[-1]:
                 X = torch.tensor(seq_padding(X), dtype=torch.long)
@@ -92,8 +93,8 @@ class data_generator:
                 M = torch.tensor(seq_padding(M), dtype=torch.long)
                 S = torch.zeros(*X.size(), dtype=torch.long)
 
-                yield X, Y, M, S
-                X, Y, M = [],[],[]
+                yield X, Y, M, S,T
+                X, Y, M,T = [],[],[],[]
 
 
 
@@ -138,13 +139,16 @@ trainset = data_generator(train_utts, train_labels)
 devset = data_generator(dev_utts, dev_labels)
 best_score = 0
 best_epoch = 0
+
+err_log = (Path(data_dir)/'err.json').open('w')
+err_list = []
 for e in range(epoch_num):
     model.train()
     tr_loss = 0
 
     for batch_idx, batch in enumerate(trainset):
         batch = tuple(t.to(device) for t in batch)
-        x_ids, y_ids, x_m, x_s = batch
+        x_ids, y_ids, x_m, x_s, t = batch
         loss = model(x_ids, x_s, x_m, y_ids)
 
         if n_gpu > 1:
@@ -162,7 +166,7 @@ for e in range(epoch_num):
     dev_acc = 0
     for batch_idx, batch in enumerate(devset):
         batch = tuple(t.to(device) for t in batch)
-        x_ids, y_ids, x_m, x_s = batch
+        x_ids, y_ids, x_m, x_s,t = batch
         with torch.no_grad():
             y_p = model(x_ids, x_s, x_m)
         y_p = y_p.detach().cpu().numpy()
@@ -171,6 +175,14 @@ for e in range(epoch_num):
 
         dev_acc += np.sum(y_p == y_ids)
         dev_size += x_ids.size(0)
+
+        for pr, tr,t_ in zip(y_p, y_ids,t):
+            if pr != tr:
+                err_list.append({
+                    'text':t_,
+                    'true':label_list[pr],
+                    'pred':label_list[tr]
+                })
 
     acc = dev_acc/dev_size
     if acc > best_score:
@@ -181,6 +193,8 @@ for e in range(epoch_num):
         model_to_save = model.module if hasattr(model, 'module') else model
         torch.save(model_to_save.state_dict(), Path(data_dir)/'kg_intent_model.pt')
         (Path(data_dir) / 'kg_intent_model.json').open('w').write(model_to_save.config.to_json_string())
+
+        json.dump(err_list, err_log, ensure_ascii=False, indent=4)
 
     logger.info(f'Epoch:{e} - dev acc:{acc:.6f} - best_score:{best_score:.4f} - best_epoch:{best_epoch}')
 
