@@ -140,7 +140,6 @@ devset = data_generator(dev_utts, dev_labels)
 best_score = 0
 best_epoch = 0
 
-err_log = (Path(data_dir)/'err.json').open('w')
 err_list = []
 for e in range(epoch_num):
     model.train()
@@ -194,7 +193,7 @@ for e in range(epoch_num):
         torch.save(model_to_save.state_dict(), Path(data_dir)/'kg_intent_model.pt')
         (Path(data_dir) / 'kg_intent_model.json').open('w').write(model_to_save.config.to_json_string())
 
-        json.dump(err_list, err_log, ensure_ascii=False, indent=4)
+        json.dump(err_list, (Path(data_dir)/'err.json').open('w'), ensure_ascii=False, indent=4)
 
     logger.info(f'Epoch:{e} - dev acc:{acc:.6f} - best_score:{best_score:.4f} - best_epoch:{best_epoch}')
 
