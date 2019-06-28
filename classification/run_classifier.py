@@ -180,8 +180,8 @@ for e in range(epoch_num):
                 err_list.append({
                     'epoch_num':e,
                     'text':t_,
-                    'true':label_list[pr],
-                    'pred':label_list[tr]
+                    'true':label_list[tr],
+                    'pred':label_list[pr]
                 })
 
     acc = dev_acc/dev_size
