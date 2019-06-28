@@ -9,7 +9,7 @@ import pandas as pd
 from configuration.config import data_dir
 
 
-df = pd.read_csv((Path(data_dir)/'raw_0614.csv').open())
+df = pd.read_csv((Path(data_dir)/'raw_0628.csv').open())
 
 label_list = sorted(list(set(df['label'].values)))
 json.dump(label_list+['负样本'], (Path(data_dir)/'kg_labels.json').open('w'), ensure_ascii=False)
