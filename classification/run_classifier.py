@@ -191,10 +191,10 @@ for e in range(epoch_num):
 
         # save
         model_to_save = model.module if hasattr(model, 'module') else model
-        torch.save(model_to_save.state_dict(), Path(data_dir)/'kg_intent_model.pt')
-        (Path(data_dir) / 'kg_intent_model.json').open('w').write(model_to_save.config.to_json_string())
+        torch.save(model_to_save.state_dict(), Path('kg_intent_model.pt'))
+        Path('kg_intent_model.json').open('w').write(model_to_save.config.to_json_string())
 
-        json.dump(err_list, (Path(data_dir)/'err.json').open('w'), ensure_ascii=False, indent=4)
+        json.dump(err_list, Path('err.json').open('w'), ensure_ascii=False, indent=4)
 
     logger.info(f'Epoch:{e} - dev acc:{acc:.6f} - best_score:{best_score:.4f} - best_epoch:{best_epoch}')
 
