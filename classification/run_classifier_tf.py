@@ -112,8 +112,7 @@ if n_gpu > 1:
     torch.cuda.manual_seed_all(42)
 
 
-model = BertForSequenceClassification.from_pretrained(pretrained_model_name_or_path=Path(data_dir)/'export',
-                                                      from_tf=True,
+model = BertForSequenceClassification.from_pretrained(pretrained_model_name_or_path=Path(data_dir),
                                                       cache_dir=bert_data_path,
                                                       num_labels=num_class)
 model.to(device)
