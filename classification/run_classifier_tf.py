@@ -112,9 +112,10 @@ if n_gpu > 1:
     torch.cuda.manual_seed_all(42)
 
 
-model = BertForSequenceClassification.from_pretrained(pretrained_model_name_or_path=bert_model_path,
-                                                          cache_dir=bert_data_path,
-                                                          num_labels=num_class)
+model = BertForSequenceClassification.from_pretrained(pretrained_model_name_or_path=Path(data_dir)/'export',
+                                                      from_tf=True,
+                                                      cache_dir=bert_data_path,
+                                                      num_labels=num_class)
 model.to(device)
 
 if n_gpu > 1:
@@ -129,7 +130,7 @@ optimizer_grouped_parameters = [
         {'params': [p for n, p in param_optimizer if any(nd in n for nd in no_decay)], 'weight_decay': 0.0}
     ]
 
-num_train_optimization_steps = len(train_utts) // batch_size * epoch_num
+num_train_optimization_steps = len(train_utts) / batch_size * epoch_num
 optimizer = BertAdam(optimizer_grouped_parameters,
                      lr=learning_rate,
                      warmup=warmup_proportion,
