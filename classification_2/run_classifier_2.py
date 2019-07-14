@@ -125,8 +125,8 @@ class BertCNN(BertPreTrainedModel):
 
     def forward(self, xid, x_seg, x_mask):
         x_encoder_layers, x_pooled_out = self.bert(xid, x_seg, x_mask, output_all_encoded_layers=False)
-        x_conv = self.conv(x_encoder_layers)  # [b,h,s1]
-        x_m = F.max_pool1d(x_conv, kernel=x_conv.size(1)).squeeze(2)  # [b,h]
+        x_conv = self.conv(x_encoder_layers.permute(0,2,1))  # [b,h,s1]
+        x_m = F.max_pool1d(x_conv, kernel_size=x_conv.size(1)).squeeze(2)  # [b,h]
 
         o = self.linear(x_m)
 
