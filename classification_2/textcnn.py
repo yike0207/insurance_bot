@@ -135,7 +135,27 @@ class TextCNN(nn.Module):
         return o, xc
 
 
-model = TextCNN()
+class HAN(nn.Module):
+    def __init__(self):
+        super(HAN, self).__init__()
+        self.gru = nn.GRU(input_size=200, hidden_size=200, bidirectional=True, batch_first=True)
+        self.linear = nn.Linear(in_features=400, out_features=num_class)
+
+    def forward(self, x_emb):
+        output, h_n = self.gru(x_emb)  # [b,s,h*2] [2,b,200]
+        h_n = torch.cat([h_n[0], h_n[1]], dim=-1)
+        att = torch.bmm(output, h_n.unsqueeze(2)).squeeze(2)
+        att = torch.softmax(att, dim=-1)  # [b, s]
+
+        e = torch.bmm(att.unsqueeze(1), output).squeeze(1)
+
+        o = self.linear(e)
+
+        return o, e
+
+
+# model = TextCNN()
+model = HAN()
 model.to(device)
 
 if n_gpu > 1:
@@ -214,9 +234,9 @@ for e in range(epoch_num):
 
         # save
         model_to_save = model.module if hasattr(model, 'module') else model
-        torch.save(model_to_save.state_dict(), Path('kg_intent_model_cnn.pt'))
+        torch.save(model_to_save.state_dict(), Path('kg_intent_model_han.pt'))
 
-        json.dump(err_list, Path('err_cnn.json').open('w'), ensure_ascii=False, indent=4)
+        json.dump(err_list, Path('err_han.json').open('w'), ensure_ascii=False, indent=4)
 
     logger.info(f'Epoch:{e} - dev acc:{acc:.6f} - best_score:{best_score:.4f} - best_epoch:{best_epoch}')
 
