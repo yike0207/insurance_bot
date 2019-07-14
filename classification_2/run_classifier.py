@@ -23,7 +23,7 @@ if torch.cuda.is_available():
     torch.backends.cudnn.benchmark=True
 
 batch_size = 64
-epoch_num = 10
+epoch_num = 30
 learning_rate = 5e-5
 warmup_proportion = 0.1
 
@@ -169,7 +169,7 @@ class HAN2(nn.Module):
 
 
 # model = TextCNN()
-model = HAN2()
+model = HAN()
 model.to(device)
 
 if n_gpu > 1:

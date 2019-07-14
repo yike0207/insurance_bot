@@ -7,6 +7,6 @@
 *.json
 *.pt
 *.txt
+*.pkl
 Data
 *dir*
-faq.py
