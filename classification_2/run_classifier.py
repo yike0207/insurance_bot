@@ -225,7 +225,7 @@ for e in range(epoch_num):
                     'true':label_list[tr],
                     'pred':label_list[pr]
                 })
-    pickle.dump(train_embed_dic, (Path(data_dir) / 'embed_cnn.pkl').open('wb'))
+    pickle.dump(train_embed_dic, Path('embed_han.pkl').open('wb'))
 
     acc = dev_acc/dev_size
     if acc > best_score:
