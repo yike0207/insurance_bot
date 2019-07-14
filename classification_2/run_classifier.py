@@ -154,8 +154,22 @@ class HAN(nn.Module):
         return o, e
 
 
+class HAN2(nn.Module):
+    def __init__(self):
+        super(HAN2, self).__init__()
+        self.gru = nn.GRU(input_size=200, hidden_size=200, bidirectional=True, batch_first=True)
+        self.linear = nn.Linear(in_features=400, out_features=num_class)
+
+    def forward(self, x_emb):
+        output, h_n = self.gru(x_emb)  # [b,s,h*2] [2,b,200]
+        h_n = torch.cat([h_n[0], h_n[1]], dim=-1)
+        o = self.linear(h_n)
+
+        return o, h_n
+
+
 # model = TextCNN()
-model = HAN()
+model = HAN2()
 model.to(device)
 
 if n_gpu > 1:
