@@ -30,6 +30,7 @@ for l in log_data:
 batch_size = 64
 
 greeting = [
+    '小马送你的',
     '进入人工系统',
     '还有什么可以帮',
     '麻烦稍后对我的服务做一下评价',
