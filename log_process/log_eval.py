@@ -15,9 +15,9 @@ logging.basicConfig(format='%(asctime)s - %(levelname)s - %(name)s -   %(message
                     level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-label_list_path = Path(data_dir)/'kelvin_kg_labels.json'
-kg_model_path = Path(data_dir)/'kelvin_kg_intent_model.pt'
-config_path = Path(data_dir)/'kelvin_kg_intent_config.json'
+label_list_path = Path(data_dir)/'kg_labels.json'
+kg_model_path = Path(data_dir)/'kg_intent_model.pt'
+config_path = Path(data_dir)/'kg_intent_config.json'
 
 label_list = json.load(label_list_path.open())
 num_class = len(label_list)
