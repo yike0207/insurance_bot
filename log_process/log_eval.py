@@ -78,7 +78,7 @@ class data_generator:
 
             for j, u in enumerate(U):
                 T.append([bert_vocab.get('[CLS]')] + [bert_vocab.get(c, bert_vocab.get('[UNK]')) for c in u] )
-                M.append([1]* len(U[j]))
+                M.append([1]* len(T[j]))
 
             if len(U) > batch_size or i == len(self.data)-1:
                 T = torch.tensor(seq_padding(T), dtype=torch.long)
