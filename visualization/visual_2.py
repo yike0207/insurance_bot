@@ -31,7 +31,7 @@ dic = {'保障范围_保险责任':'duty',
 y = []
 X = []
 
-embed_dic = pickle.load((Path(data_dir)/'embed.pkl').open('rb'))
+embed_dic = pickle.load((Path(data_dir)/'embed_bert_cnn.pkl').open('rb'))
 for label, embeds in embed_dic.items():
     for embed in embeds:
         X.append(embed)
@@ -51,7 +51,7 @@ def plot_embedding(X, title=None):
         # plt.text(X[i, 0], X[i, 1], str(sel_col.index(y[i])),
         plt.text(X[i, 0], X[i, 1], str('+'),
                  color=plt.cm.Set1(sel_col.index(y[i]) / 10.),
-                 fontdict={'weight': 'bold', 'size': 9})
+                 fontdict={'weight': 'bold', 'size': 9},height=10, aspect=1)
 
     # if hasattr(offsetbox, 'AnnotationBbox'):
     #     # only print thumbnails with matplotlib > 1.0

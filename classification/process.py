@@ -9,7 +9,7 @@ import pandas as pd
 from configuration.config import data_dir
 
 
-df = pd.read_csv((Path(data_dir)/'raw_0708.csv').open())
+df = pd.read_csv((Path(data_dir)/'raw_0712.csv').open())
 
 label_list = sorted(list(set(df['label'].values)))
 json.dump(label_list+['负样本'], (Path(data_dir)/'kg_labels.json').open('w'), ensure_ascii=False)
@@ -38,7 +38,7 @@ for row in df.iterrows():
     else:
         dev_data.append(d)
 
-print(f'train size: {len(train_data)}, dev size: {len(dev_data)}')  # train size: 28364, dev size: 7148
+print(f'train size: {len(train_data)}, dev size: {len(dev_data)}')  # train size: 25688, dev size: 6388
 
 # negative samples
 neg_list = []
