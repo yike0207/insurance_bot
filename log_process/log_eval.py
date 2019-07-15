@@ -67,8 +67,9 @@ class data_generator:
         self.data = data
 
     def __iter__(self):
-        S, U, O, M, T = [], [],[],[],[]
+        S, U, O, M, T = [], [''],[],[],[]
         for i, (sess_id, ds) in enumerate(self.data.items()):
+            pre_obj_t = ''
             for k, d in enumerate(ds):
                 sess_id, dt, obj_type, text = d
 
@@ -91,8 +92,10 @@ class data_generator:
                     T = torch.tensor(seq_padding(T), dtype=torch.long)
                     M = torch.tensor(seq_padding(M), dtype=torch.long)
                     Sg = torch.zeros(*T.size(), dtype=torch.long)
+                    logger.info(f'T:{T.size()}, M:{M.size()}, Sg:{Sg.size()}')
                     yield S, U, O, M, Sg, T
-                    S, U, O, M, T = [],[],[],[], []
+                    S, U, O, M, T = [],[''],[],[], []
+                    pre_obj_t = ''
 
 eval_data = data_generator(log_data_dic)
 
