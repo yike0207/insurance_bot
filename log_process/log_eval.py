@@ -32,7 +32,7 @@ batch_size = 64
 greeting = [
     '小马送你的',
     '进入人工系统',
-    '还有什么可以帮',
+    '有什么可以帮',
     '麻烦稍后对我的服务做一下评价',
     '感谢您对众安保险的支持',
     '以上问题都不是',
@@ -67,7 +67,7 @@ class data_generator:
         self.data = data
 
     def __iter__(self):
-        S, U, O, M, T = [], [''],[],[],[]
+        S, U, O, M, T = [], [],[],[],[]
         for i, (sess_id, ds) in enumerate(self.data.items()):
             pre_obj_t = ''
             for k, d in enumerate(ds):
@@ -77,7 +77,7 @@ class data_generator:
                 if any(s in text for s in greeting):
                     continue
 
-                if k > 0 and pre_obj_t == ds[k][2]:
+                if k > 0 and pre_obj_t == ds[k][2] and len(U)>0:
                     U[-1] += '，' + text
                 else:
                     U.append(text)
@@ -85,7 +85,7 @@ class data_generator:
                     O.append(obj_type)
                     pre_obj_t = obj_type
 
-                if len(U) > batch_size or i == len(self.data)-1:
+                if len(U) >= batch_size or i == len(self.data)-1:
                     for j, u in enumerate(U):
                         T.append([bert_vocab.get('[CLS]')] + [bert_vocab.get(c, bert_vocab.get('[UNK]')) for c in u])
                         M.append([1] * len(T[j]))
@@ -94,7 +94,7 @@ class data_generator:
                     Sg = torch.zeros(*T.size(), dtype=torch.long)
                     logger.info(f'T:{T.size()}, M:{M.size()}, Sg:{Sg.size()}')
                     yield S, U, O, M, Sg, T
-                    S, U, O, M, T = [],[''],[],[], []
+                    S, U, O, M, T = [],[],[],[], []
                     pre_obj_t = ''
 
 eval_data = data_generator(log_data_dic)
