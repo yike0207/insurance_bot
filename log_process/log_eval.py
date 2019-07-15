@@ -27,7 +27,7 @@ for l in log_data:
     l = l.strip().split(',')
     log_data_dic[l[0]].append(l)
 
-batch_size = 64
+batch_size = 32
 
 greeting = [
     '小马送你的',
