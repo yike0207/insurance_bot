@@ -15,6 +15,8 @@ p.readline()
 group = defaultdict(list)
 for l in tqdm(p):
     l = l.strip().split(',')
+    if len(l) != 4:
+        continue
 
     group[l[0]].append(l)
 
@@ -22,6 +24,7 @@ for session, ds in tqdm(group.items()):
     if all(d[2]=='客户' for d in ds):
         continue
     for d in ds:
+        d[3] = d[3].replace(',', '，')
         p_output.write(','.join(d) + '\n')
 
 

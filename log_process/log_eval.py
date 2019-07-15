@@ -1,9 +1,8 @@
 import collections
 import json
 import logging
-import random
 from pathlib import Path
-import numpy as np
+
 import torch
 import torch.nn as nn
 from pytorch_pretrained_bert import BertConfig, BertForSequenceClassification
@@ -16,8 +15,7 @@ logging.basicConfig(format='%(asctime)s - %(levelname)s - %(name)s -   %(message
 logger = logging.getLogger(__name__)
 
 label_list_path = Path(data_dir)/'kg_labels.json'
-kg_model_path = Path(data_dir)/'kg_intent_model.pt'
-config_path = Path(data_dir)/'kg_intent_config.json'
+
 
 label_list = json.load(label_list_path.open())
 num_class = len(label_list)
@@ -84,12 +82,16 @@ class data_generator:
 
             if len(U) > batch_size or i == len(self.data)-1:
                 T = torch.tensor(seq_padding(T), dtype=torch.long)
-                M = torch.tensor(seq_padding(U), dtype=torch.long)
-                Sg = torch.zeros(*U.size(), dtype=torch.long)
+                M = torch.tensor(seq_padding(M), dtype=torch.long)
+                Sg = torch.zeros(*T.size(), dtype=torch.long)
                 yield S, U, M, Sg, T
                 S, U, M, T = [],[],[],[]
 
+eval_data = data_generator(log_data)
 
+
+kg_model_path = Path(data_dir)/'kg_intent_model.pt'
+config_path = Path(data_dir)/'kg_intent_config.json'
 config = BertConfig(str(config_path))
 model = BertForSequenceClassification(config, num_labels=num_class)
 model.load_state_dict(torch.load(kg_model_path, map_location='cpu' if not torch.cuda.is_available() else None))
@@ -109,7 +111,6 @@ if n_gpu > 1:
 maps = json.load((Path(data_dir)/'maps_for_log.json').open())
 
 model.eval()
-eval_data = data_generator(log_data)
 res_p = Path('log_labels.csv').open('w')
 for batch_idx, batch in enumerate(eval_data):
     batch = tuple(t if i<2 else t.to(device) for i, t in enumerate(batch))
