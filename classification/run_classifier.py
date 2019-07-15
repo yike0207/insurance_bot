@@ -105,11 +105,11 @@ if n_gpu > 1:
     logger.info(f"let's use {n_gpu} gpu")
 
 # random seed
-random.seed(42)
-np.random.seed(42)
-torch.manual_seed(42)
+random.seed(44)
+np.random.seed(44)
+torch.manual_seed(44)
 if n_gpu > 1:
-    torch.cuda.manual_seed_all(42)
+    torch.cuda.manual_seed_all(44)
 
 
 model = BertForSequenceClassification.from_pretrained(pretrained_model_name_or_path=bert_model_path,
