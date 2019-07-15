@@ -55,7 +55,7 @@ bert_vocab = load_vocab(bert_vocab_path)
 def seq_padding(X):
     L = list(map(len, X))
     ML = min(max(L), 150)
-    return [x + [0]*(ML-len(x)) for x in X]
+    return [x[:ML] + [0]*(ML-len(x)) for x in X]
 
 class data_generator:
     def __init__(self, data):
