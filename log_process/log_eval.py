@@ -22,11 +22,15 @@ num_class = len(label_list)
 
 log_data = (Path(data_dir)/'log_0709_processed.csv').open()
 log_data.readline()
-log_data = [l for l in log_data]
+log_data_dic = collections.defaultdict(list)
+for l in log_data:
+    l = l.strip().split(',')
+    log_data_dic[l[0]].append(l)
 
 batch_size = 64
 
 greeting = [
+    '进入人工系统',
     '还有什么可以帮',
     '麻烦稍后对我的服务做一下评价',
     '感谢您对众安保险的支持',
@@ -62,19 +66,22 @@ class data_generator:
         self.data = data
 
     def __iter__(self):
-        S, U, M, T = [], [],[],[]
-        for i, d in enumerate(self.data):
-            sess_id, dt, obj_type, text = d.strip().split(',')
+        S, U, O, M, T = [], [],[],[],[]
+        for i, (sess_id, ds) in enumerate(self.data.items()):
+            for k, d in enumerate(ds):
+                sess_id, dt, obj_type, text = d
 
-            # 过滤掉系统回复
-            if any(s in text for s in greeting):
-                continue
+                # 过滤掉系统回复
+                if any(s in text for s in greeting):
+                    continue
 
-            if i > 0 and self.data[i-1] == self.data[i]:
-                U[-1] += '，' + text
-            else:
-                U.append(text)
-                S.append(sess_id)
+                if k > 0 and pre_obj_t == ds[k][2]:
+                    U[-1] += '，' + text
+                else:
+                    U.append(text)
+                    S.append(sess_id)
+                    O.append(obj_type)
+                    pre_obj_t = obj_type
 
             if len(U) > batch_size or i == len(self.data)-1:
                 for j, u in enumerate(U):
@@ -83,10 +90,10 @@ class data_generator:
                 T = torch.tensor(seq_padding(T), dtype=torch.long)
                 M = torch.tensor(seq_padding(M), dtype=torch.long)
                 Sg = torch.zeros(*T.size(), dtype=torch.long)
-                yield S, U, M, Sg, T
-                S, U, M, T = [],[],[],[]
+                yield S, U, O, M, Sg, T
+                S, U, O, M, T = [],[],[],[], []
 
-eval_data = data_generator(log_data)
+eval_data = data_generator(log_data_dic)
 
 
 kg_model_path = Path(data_dir)/'kg_intent_model.pt'
@@ -112,8 +119,8 @@ maps = json.load((Path(data_dir)/'maps_for_log.json').open())
 model.eval()
 res_p = Path('log_labels.csv').open('w')
 for batch_idx, batch in enumerate(eval_data):
-    batch = tuple(t if i<2 else t.to(device) for i, t in enumerate(batch))
-    sess, utts, masks, segs, t_ids = batch
+    batch = tuple(t if i<3 else t.to(device) for i, t in enumerate(batch))
+    sess, utts, obj_t, masks, segs, t_ids = batch
 
     y_p = model(t_ids, segs, masks)
     y_p = torch.argmax(y_p, dim=-1)
@@ -121,11 +128,11 @@ for batch_idx, batch in enumerate(eval_data):
 
     y_p = [maps[label_list[p]] for p in y_p]
 
-    for s, u, p in zip(sess, utts, y_p):
+    for s, u, o, p in zip(sess, utts, obj_t, y_p):
         if p == '负样本':
             continue
 
-        res_p.write(f'{s},{u},{p}\n')
+        res_p.write(f'{s},{u},{o},{p}\n')
 
 
 
