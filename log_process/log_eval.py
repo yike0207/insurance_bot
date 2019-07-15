@@ -91,6 +91,7 @@ class data_generator:
                 T = torch.tensor(seq_padding(T), dtype=torch.long)
                 M = torch.tensor(seq_padding(M), dtype=torch.long)
                 Sg = torch.zeros(*T.size(), dtype=torch.long)
+                logger.info(f'T:{T.size()}, M:{M.size()}, Sg:{Sg.size()}')
                 yield S, U, O, M, Sg, T
                 S, U, O, M, T = [],[],[],[], []
 
