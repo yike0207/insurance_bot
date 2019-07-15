@@ -76,11 +76,10 @@ class data_generator:
                 U.append(text)
                 S.append(sess_id)
 
-            for j, u in enumerate(U):
-                T.append([bert_vocab.get('[CLS]')] + [bert_vocab.get(c, bert_vocab.get('[UNK]')) for c in u] )
-                M.append([1]* len(T[j]))
-
             if len(U) > batch_size or i == len(self.data)-1:
+                for j, u in enumerate(U):
+                    T.append([bert_vocab.get('[CLS]')] + [bert_vocab.get(c, bert_vocab.get('[UNK]')) for c in u])
+                    M.append([1] * len(T[j]))
                 T = torch.tensor(seq_padding(T), dtype=torch.long)
                 M = torch.tensor(seq_padding(M), dtype=torch.long)
                 Sg = torch.zeros(*T.size(), dtype=torch.long)
@@ -116,7 +115,7 @@ for batch_idx, batch in enumerate(eval_data):
     batch = tuple(t if i<2 else t.to(device) for i, t in enumerate(batch))
     sess, utts, masks, segs, t_ids = batch
 
-    y_p = model(t_ids, masks, segs)
+    y_p = model(t_ids, segs, masks)
     y_p = torch.argmax(y_p, dim=-1)
     y_p = y_p.detach().cpu().numpy()
 
