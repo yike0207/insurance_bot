@@ -27,7 +27,7 @@ for l in log_data:
     l = l.strip().split(',')
     log_data_dic[l[0]].append(l)
 
-batch_size = 32
+batch_size = 64
 
 greeting = [
     '小马送你的',
@@ -84,16 +84,15 @@ class data_generator:
                     O.append(obj_type)
                     pre_obj_t = obj_type
 
-            if len(U) > batch_size or i == len(self.data)-1:
-                for j, u in enumerate(U):
-                    T.append([bert_vocab.get('[CLS]')] + [bert_vocab.get(c, bert_vocab.get('[UNK]')) for c in u])
-                    M.append([1] * len(T[j]))
-                T = torch.tensor(seq_padding(T), dtype=torch.long)
-                M = torch.tensor(seq_padding(M), dtype=torch.long)
-                Sg = torch.zeros(*T.size(), dtype=torch.long)
-                logger.info(f'T:{T.size()}, M:{M.size()}, Sg:{Sg.size()}')
-                yield S, U, O, M, Sg, T
-                S, U, O, M, T = [],[],[],[], []
+                if len(U) > batch_size or i == len(self.data)-1:
+                    for j, u in enumerate(U):
+                        T.append([bert_vocab.get('[CLS]')] + [bert_vocab.get(c, bert_vocab.get('[UNK]')) for c in u])
+                        M.append([1] * len(T[j]))
+                    T = torch.tensor(seq_padding(T), dtype=torch.long)
+                    M = torch.tensor(seq_padding(M), dtype=torch.long)
+                    Sg = torch.zeros(*T.size(), dtype=torch.long)
+                    yield S, U, O, M, Sg, T
+                    S, U, O, M, T = [],[],[],[], []
 
 eval_data = data_generator(log_data_dic)
 
