@@ -151,7 +151,7 @@ class PregeneratedDataset(Dataset):
                 torch.tensor(self.lm_label_positions[item]).ge(0))
 
 reduce_memory = False
-train_batch_size = 32
+train_batch_size = 12
 warmup_proportion = 0.1
 learning_rate = 3e-5
 epochs = 3
