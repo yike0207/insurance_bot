@@ -13,5 +13,9 @@ export ROOT_DIR="root"
 
 
 
-/root/anaconda3/envs/py36/bin/python log_process/log_eval.py
+#/root/anaconda3/envs/py36/bin/python log_process/log_eval.py
+
+
+
+/root/anaconda3/envs/py36/bin/python pretrain_LM/finetune_on_pregenerated.py
 
